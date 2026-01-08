@@ -10,25 +10,54 @@ import {
     Box,
     Divider,
 } from '@mui/material';
-import { WorkflowItem } from '../../types/workflow.types';
+import { WorkflowItem, WorkflowActionType } from '../../types/workflow.types';
+import { useAppSelector } from '../../store/hooks';
+import { getAvailableWorkflowActions } from '../../utils/rolePermissions';
 
 interface WorkflowDetailsModalProps {
     open: boolean;
     onClose: () => void;
     workflow: WorkflowItem | null;
+    onStatusUpdate?: (status: string) => Promise<void>;
 }
 
-export const WorkflowDetailsModal = ({ open, onClose, workflow }: WorkflowDetailsModalProps) => {
+export const WorkflowDetailsModal = ({ open, onClose, workflow, onStatusUpdate }: WorkflowDetailsModalProps) => {
+    const { user } = useAppSelector((state) => state.auth);
+
     if (!workflow) return null;
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'APPROVED': return 'success';
-            case 'REJECTED': return 'error';
+            case 'APPROVED':
+            case 'COMPLETED': return 'success';
+            case 'REJECTED':
+            case 'CANCELLED': return 'error';
             case 'SUBMITTED':
             case 'IN_REVIEW': return 'warning';
+            case 'REOPENED': return 'info';
             default: return 'default';
         }
+    };
+
+    const availableActions = user ? getAvailableWorkflowActions(user.role, workflow.status) : [];
+
+    const handleAction = async (action: WorkflowActionType) => {
+        if (!onStatusUpdate) return;
+
+        let newStatus = '';
+        switch (action) {
+            case WorkflowActionType.APPROVE: newStatus = 'APPROVED'; break;
+            case WorkflowActionType.REJECT: newStatus = 'REJECTED'; break;
+            case WorkflowActionType.COMPLETE: newStatus = 'COMPLETED'; break;
+            case WorkflowActionType.CANCEL: newStatus = 'CANCELLED'; break;
+            case WorkflowActionType.REOPEN: newStatus = 'REOPENED'; break;
+            case WorkflowActionType.SUBMIT: newStatus = 'SUBMITTED'; break;
+            case WorkflowActionType.REVIEW: newStatus = 'IN_REVIEW'; break;
+            default: return;
+        }
+
+        await onStatusUpdate(newStatus);
+        onClose();
     };
 
     return (
@@ -117,7 +146,36 @@ export const WorkflowDetailsModal = ({ open, onClose, workflow }: WorkflowDetail
                 </Grid>
             </DialogContent>
 
-            <DialogActions>
+            <DialogActions sx={{ gap: 1, p: 2 }}>
+                {availableActions.includes(WorkflowActionType.REOPEN) && (
+                    <Button
+                        onClick={() => handleAction(WorkflowActionType.REOPEN)}
+                        color="info"
+                        variant="outlined"
+                    >
+                        Reopen
+                    </Button>
+                )}
+                {availableActions.includes(WorkflowActionType.CANCEL) && (
+                    <Button
+                        onClick={() => handleAction(WorkflowActionType.CANCEL)}
+                        color="error"
+                    >
+                        Cancel Workflow
+                    </Button>
+                )}
+                {availableActions.includes(WorkflowActionType.COMPLETE) && (
+                    <Button
+                        onClick={() => handleAction(WorkflowActionType.COMPLETE)}
+                        color="success"
+                        variant="contained"
+                    >
+                        Mark Completed
+                    </Button>
+                )}
+                {/* Standard Approve/Reject could also go here if desired, keeping simple for now based on request */}
+
+                <Box sx={{ flexGrow: 1 }} />
                 <Button onClick={onClose}>Close</Button>
             </DialogActions>
         </Dialog>

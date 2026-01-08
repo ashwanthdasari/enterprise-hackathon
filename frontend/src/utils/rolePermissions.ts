@@ -48,7 +48,7 @@ export const ROLE_PERMISSIONS = {
     canApproveWorkflows: false,
     canRejectWorkflows: false,
     canReassignWorkflows: false,
-    canViewReports: false,
+    canViewReports: true,
     canManageSettings: false,
   },
   [UserRole.VIEWER]: {

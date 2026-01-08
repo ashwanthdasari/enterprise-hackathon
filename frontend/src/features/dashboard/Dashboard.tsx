@@ -1,82 +1,48 @@
-import { useEffect, useState } from 'react';
 import { Box, Typography, Skeleton, Stack, alpha, useTheme, Paper } from '@mui/material';
 import { useAppSelector } from '@/store/hooks';
 import { KPICard } from '@/components/widgets/KPICard';
 import { ChartWidget } from '@/components/widgets/ChartWidget';
 import { ChartType } from '@/types/dashboard.types';
-import { dashboardService } from '@/services/dashboardService';
+import { useGetDashboardStatsQuery } from '@/store/api/dashboardApi';
 import { UserRole } from '@/types/auth.types';
 
 export const Dashboard = () => {
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
-  const [dashboardData, setDashboardData] = useState<{
-    kpis: Array<{ label: string; value: number; trend?: number; trendDirection?: 'up' | 'down' | 'neutral' }>;
-    charts: {
-      workflowTrend: {
-        labels: string[];
-        datasets: Array<{ label: string; data: number[]; borderColor: string }>;
-      };
-      statusDistribution?: {
-        labels: string[];
-        datasets: Array<{ label: string; data: number[]; backgroundColor: string[] }>;
-      };
-    };
-  } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: stats, isLoading } = useGetDashboardStatsQuery();
 
   const isReviewerOrViewer = user?.role === UserRole.REVIEWER || user?.role === UserRole.VIEWER;
 
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      if (user) {
-        setIsLoading(true);
-        try {
-          // Fetch real data from backend
-          const stats = await dashboardService.getStats();
-
-          // Transform backend stats to UI format
-          setDashboardData({
-            kpis: [
-              { label: 'Total Users', value: stats.totalUsers, trend: 12, trendDirection: 'up' },
-              { label: 'Total Workflows', value: stats.totalWorkflows, trend: 5, trendDirection: 'up' },
-              { label: 'Pending Reviews', value: stats.pendingReviews, trend: 0, trendDirection: 'neutral' },
-              { label: 'Active Projects', value: 8, trend: 2, trendDirection: 'up' }, // Placeholder for now
-            ],
-            charts: {
-              workflowTrend: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [
-                  {
-                    label: 'Workflow Activity',
-                    // Logic to show some activity, real historical data would need another endpoint
-                    data: [12, 19, 3, 5, 2, stats.totalWorkflows],
-                    borderColor: theme.palette.primary.main,
-                  },
-                ],
-              },
-              statusDistribution: {
-                labels: Object.keys(stats.statusDistribution),
-                datasets: [
-                  {
-                    label: 'Count',
-                    data: Object.values(stats.statusDistribution),
-                    backgroundColor: ['#002D62', '#ED6C02', '#0288D1', '#2E8B57', '#D32F2F'],
-                  },
-                ],
-              }
-            },
-          });
-        } catch (error) {
-          console.error('Failed to load dashboard data:', error);
-        } finally {
-          setIsLoading(false);
-        }
+  const dashboardData = stats ? {
+    kpis: [
+      { label: 'Total Users', value: stats.totalUsers, trend: 12, trendDirection: 'up' as const },
+      { label: 'Total Workflows', value: stats.totalWorkflows, trend: 5, trendDirection: 'up' as const },
+      { label: 'Pending Reviews', value: stats.pendingReviews, trend: 0, trendDirection: 'neutral' as const },
+      { label: 'Active Projects', value: stats.activeProjects, trend: 2, trendDirection: 'up' as const },
+    ],
+    charts: {
+      workflowTrend: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [
+          {
+            label: 'Workflow Activity',
+            data: [12, 19, 3, 5, 2, stats.totalWorkflows],
+            borderColor: theme.palette.primary.main,
+          },
+        ],
+      },
+      statusDistribution: {
+        labels: Object.keys(stats.statusDistribution),
+        datasets: [
+          {
+            label: 'Count',
+            data: Object.values(stats.statusDistribution),
+            backgroundColor: ['#002D62', '#ED6C02', '#0288D1', '#2E8B57', '#D32F2F'],
+          },
+        ],
       }
-    };
-
-    loadDashboardData();
-  }, [user, isReviewerOrViewer, theme.palette.primary.main]);
+    },
+  } : null;
 
   if (!user) return null;
 

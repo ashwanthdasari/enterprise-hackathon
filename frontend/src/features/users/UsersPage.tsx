@@ -220,7 +220,7 @@ export const UsersPage = () => {
                                 <TableCell sx={{ fontWeight: 600 }}>Role</TableCell>
                                 <TableCell sx={{ fontWeight: 600 }}>Department</TableCell>
                                 <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>
+                                {isAdmin && <TableCell align="right" sx={{ fontWeight: 600 }}>Actions</TableCell>}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -261,23 +261,16 @@ export const UsersPage = () => {
                                             sx={{ borderRadius: 1.5, fontWeight: 600 }}
                                         />
                                     </TableCell>
-                                    <TableCell align="right">
-                                        {isAdmin && (
-                                            <>
-                                                <IconButton size="small" onClick={() => handleOpenDialog(u)} color="primary">
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
-                                                <IconButton size="small" onClick={() => handleDelete(u.id)} color="error">
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            </>
-                                        )}
-                                        {!isAdmin && (
-                                            <IconButton size="small">
-                                                <MoreIcon fontSize="small" />
+                                    {isAdmin && (
+                                        <TableCell align="right">
+                                            <IconButton size="small" onClick={() => handleOpenDialog(u)} color="primary">
+                                                <EditIcon fontSize="small" />
                                             </IconButton>
-                                        )}
-                                    </TableCell>
+                                            <IconButton size="small" onClick={() => handleDelete(u.id)} color="error">
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))}
                         </TableBody>

@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Button,
   Card,
   Chip,
   Container,
+  Paper,
   Typography,
   IconButton,
+  Tab,
+  Tabs,
   Tooltip,
 } from '@mui/material';
 import {
@@ -20,54 +23,43 @@ import {
   Check as CheckIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import { workflowService } from '../../services/workflowService';
 import { WorkflowItem, CreateWorkflowRequest } from '../../types/workflow.types';
 import { useSnackbar } from '../../hooks/useSnackbar';
 import { CreateWorkflowModal } from './CreateWorkflowModal';
 import { hasPermission } from '../../utils/rolePermissions';
-import { UserRole } from '../../types/auth.types';
-
 import { useAppSelector } from '../../store/hooks';
+import {
+  useGetWorkflowsQuery,
+  useCreateWorkflowMutation,
+  useUpdateWorkflowStatusMutation,
+} from '../../store/api/workflowApi';
 
 import { WorkflowDetailsModal } from './WorkflowDetailsModal';
 
 export const Workflows = () => {
   const { user } = useAppSelector((state) => state.auth);
-  const [workflows, setWorkflows] = useState<WorkflowItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: workflows = [], isLoading: loading } = useGetWorkflowsQuery();
+  const [createWorkflow, { isLoading: isSubmitting }] = useCreateWorkflowMutation();
+  const [updateStatus] = useUpdateWorkflowStatusMutation();
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowItem | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentTab, setCurrentTab] = useState('ALL');
   const { showSnackbar } = useSnackbar();
 
-  const fetchWorkflows = async () => {
-    try {
-      setLoading(true);
-      const data = await workflowService.getWorkflows();
-      setWorkflows(data);
-    } catch (error) {
-      showSnackbar('Failed to fetch workflows', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchWorkflows();
-  }, []);
+  const canCreate = user && hasPermission(user.role, 'canCreateWorkflows');
 
   const handleCreateWorkflow = async (data: CreateWorkflowRequest) => {
     try {
-      setIsSubmitting(true);
-      await workflowService.createWorkflow(data);
+      await createWorkflow(data).unwrap();
       showSnackbar('Workflow created successfully!', 'success');
       setIsCreateModalOpen(false);
-      fetchWorkflows(); // Refresh list
-    } catch (error) {
-      showSnackbar('Failed to create workflow', 'error');
-    } finally {
-      setIsSubmitting(false);
+    } catch (error: any) {
+      console.error('Create workflow error:', error);
+      // Fallback to JSON stringify to see full structure if message is missing
+      const msg = error?.data?.message || error?.error || JSON.stringify(error);
+      showSnackbar(msg, 'error');
     }
   };
 
@@ -79,12 +71,16 @@ export const Workflows = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'APPROVED':
+      case 'COMPLETED':
         return 'success';
       case 'REJECTED':
+      case 'CANCELLED':
         return 'error';
       case 'SUBMITTED':
       case 'IN_REVIEW':
         return 'warning';
+      case 'REOPENED':
+        return 'info';
       case 'DRAFT':
       default:
         return 'default';
@@ -130,9 +126,8 @@ export const Workflows = () => {
       renderCell: (params: GridRenderCellParams) => {
         const handleStatusUpdate = async (newStatus: string) => {
           try {
-            await workflowService.updateStatus(params.row.id, newStatus);
+            await updateStatus({ id: params.row.id, status: newStatus }).unwrap();
             showSnackbar(`Workflow ${newStatus.toLowerCase()} successfully`, 'success');
-            fetchWorkflows();
           } catch (err: any) {
             console.error(err);
             const msg = err.response?.data?.message || 'Failed to update status';
@@ -181,6 +176,27 @@ export const Workflows = () => {
     },
   ];
 
+  const filteredWorkflows = workflows.filter((workflow) => {
+    if (currentTab === 'ALL') return true;
+    return workflow.status === currentTab;
+  });
+
+  const handleModalStatusUpdate = async (newStatus: string) => {
+    if (!selectedWorkflow) return;
+    try {
+      await updateStatus({ id: selectedWorkflow.id, status: newStatus }).unwrap();
+      showSnackbar(`Workflow ${newStatus.toLowerCase()} successfully`, 'success');
+      // No need to close modal manually here as the modal handles it, 
+      // but if we want to update the selectedWorkflow local state we could.
+      // However, the query will invalidate and refetch.
+      setIsDetailsOpen(false);
+    } catch (err: any) {
+      console.error(err);
+      const msg = err.response?.data?.message || 'Failed to update status';
+      showSnackbar(msg, 'error');
+    }
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4, alignItems: 'center' }}>
@@ -192,21 +208,43 @@ export const Workflows = () => {
             Manage and track all your workflow requests
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setIsCreateModalOpen(true)}
-          sx={{
-            px: 3,
-            py: 1.5,
-            borderRadius: 2,
-            background: 'linear-gradient(45deg, #002D62 30%, #004ba0 90%)',
-            boxShadow: '0 3px 5px 2px rgba(0, 45, 98, .3)',
-          }}
-        >
-          New Workflow
-        </Button>
+        {canCreate && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setIsCreateModalOpen(true)}
+            sx={{
+              px: 3,
+              py: 1.5,
+              borderRadius: 2,
+              background: 'linear-gradient(45deg, #002D62 30%, #004ba0 90%)',
+              boxShadow: '0 3px 5px 2px rgba(0, 45, 98, .3)',
+            }}
+          >
+            New Workflow
+          </Button>
+        )}
       </Box>
+
+      <Paper sx={{ mb: 3, borderRadius: 2 }}>
+        <Tabs
+          value={currentTab}
+          onChange={(_, newValue) => setCurrentTab(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{ px: 2 }}
+        >
+          <Tab label="All" value="ALL" />
+          <Tab label="Draft" value="DRAFT" />
+          <Tab label="Submitted" value="SUBMITTED" />
+          <Tab label="In Review" value="IN_REVIEW" />
+          <Tab label="Approved" value="APPROVED" />
+          <Tab label="Rejected" value="REJECTED" />
+          <Tab label="Reopened" value="REOPENED" />
+          <Tab label="Completed" value="COMPLETED" />
+          <Tab label="Cancelled" value="CANCELLED" />
+        </Tabs>
+      </Paper>
 
       <Card
         sx={{
@@ -218,7 +256,7 @@ export const Workflows = () => {
         }}
       >
         <DataGrid
-          rows={workflows}
+          rows={filteredWorkflows}
           columns={columns}
           loading={loading}
           initialState={{
@@ -249,6 +287,7 @@ export const Workflows = () => {
         open={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
         workflow={selectedWorkflow}
+        onStatusUpdate={handleModalStatusUpdate}
       />
     </Container>
   );

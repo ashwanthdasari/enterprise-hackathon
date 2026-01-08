@@ -25,7 +25,7 @@ public class WorkflowService {
     @Transactional
     public WorkflowDTO createWorkflow(CreateWorkflowRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("User not found"));
+                .orElseThrow(() -> new BusinessException("User not found: " + username));
 
         Workflow workflow = new Workflow();
         workflow.setTitle(request.title());

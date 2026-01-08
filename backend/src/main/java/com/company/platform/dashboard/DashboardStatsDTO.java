@@ -6,5 +6,8 @@ public record DashboardStatsDTO(
         long totalUsers,
         long totalWorkflows,
         long pendingReviews,
-        Map<String, Long> statusDistribution) {
+        long activeProjects,
+        Map<String, Long> statusDistribution,
+        Map<String, Long> departmentDistribution,
+        Map<String, Long> monthlyGrowth) {
 }

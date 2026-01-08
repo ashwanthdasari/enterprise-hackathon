@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
+// Force Rebuild 4
 import { Box, CircularProgress } from '@mui/material';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { store } from './store/store';
@@ -89,7 +90,7 @@ function App() {
                 <Route
                   path="/reports"
                   element={
-                    <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.MANAGER]}>
+                    <ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.MANAGER, UserRole.REVIEWER]}>
                       <MainLayout>
                         <ReportsPage />
                       </MainLayout>

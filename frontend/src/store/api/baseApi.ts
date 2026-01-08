@@ -5,7 +5,7 @@ import { env } from '@/config/env';
 const baseQuery = fetchBaseQuery({
   baseUrl: env.api.baseUrl,
   timeout: env.api.timeout,
-  prepareHeaders: (headers) => {
+  prepareHeaders: (headers, { getState }) => {
     const token = localStorage.getItem(env.auth.tokenKey);
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);

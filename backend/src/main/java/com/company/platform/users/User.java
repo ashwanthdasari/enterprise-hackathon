@@ -24,6 +24,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
+    private String department;
 
     // ===== GETTERS =====
     public String getFirstName() {
@@ -38,6 +39,10 @@ public class User {
         return email;
     }
 
+    public String getDepartment() {
+        return department;
+    }
+
     // ===== SETTERS =====
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -49,6 +54,10 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     public Long getId() {
@@ -99,6 +108,7 @@ public class User {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
+
     // ===== AUDIT =====
     @Column(name = "created_at", nullable = false, updatable = false)
     private java.time.LocalDateTime createdAt;
