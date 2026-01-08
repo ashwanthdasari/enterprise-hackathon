@@ -1,0 +1,75 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: enterprise-platform-backend
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/project_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # change to validate in production
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+    time-zone: UTC
+
+
+# ===============================
+# JWT CONFIGURATION
+# ===============================
+jwt:
+  secret: THIS_IS_A_VERY_LONG_SECRET_KEY_12345678901234567890
+  expiration-ms: 3600000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+  api-docs:
+    path: /v3/api-docs
+
+# ===============================
+# LOGGING
+# ===============================
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# ===============================
+# MANAGEMENT / ACTUATOR (OPTIONAL)
+# ===============================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# ===============================
+# APPLICATION BUSINESS CONFIG
+# ===============================
+app:
+  workflow:
+    enabled: true
+    default-status: CREATED
+
+  rules:
+    max-approval-amount: 100000
+    enable-strict-validation: true
+
+  audit:
+    enabled: true
