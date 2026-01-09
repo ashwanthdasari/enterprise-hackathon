@@ -48,9 +48,12 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration
-                .setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173", "http://localhost:3001")); // Allow
-                                                                                                                        // frontend
-                                                                                                                        // ports
+                .setAllowedOrigins(List.of(
+                        "http://localhost:3000",
+                        "http://localhost:5173",
+                        "http://localhost:3001",
+                        "http://18.206.74.221:3000",
+                        "http://18.206.74.221")); // Allow frontend ports
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
