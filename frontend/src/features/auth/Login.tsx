@@ -19,8 +19,8 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { loginSchema, LoginFormData } from '@/utils/validation';
 import { useAppDispatch } from '@/store/hooks';
 import { setCredentials } from '@/store/slices/authSlice';
-import { mockLogin } from '@/utils/mockApi';
 import { env } from '@/config/env';
+
 
 export const Login = () => {
   const navigate = useNavigate();

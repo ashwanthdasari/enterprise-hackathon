@@ -15,7 +15,6 @@ import {
   Stack,
   List,
   ListItem,
-  ListItemText,
 } from '@mui/material';
 import { WorkflowItem, WorkflowActionType, WorkflowStatus } from '@/types/workflow.types';
 import { useAppSelector } from '@/store/hooks';
@@ -161,11 +160,11 @@ export const WorkflowDetails = ({ open, workflow, onClose, onAction, onEdit }: W
                 Workflow Progression
               </Typography>
               <Divider sx={{ my: 2, borderColor: 'rgba(0,45,98,0.1)' }} />
-              {workflow.history.length > 0 ? (
+              {workflow.history && workflow.history.length > 0 ? (
                 <List disablePadding>
                   {workflow.history.map((entry, index) => (
-                    <ListItem key={entry.id} sx={{ px: 0, py: 2, position: 'relative' }}>
-                      {index !== workflow.history.length - 1 && (
+                    <ListItem key={index} sx={{ px: 0, py: 2, position: 'relative' }}>
+                      {index !== workflow.history!.length - 1 && (
                         <Box sx={{ position: 'absolute', left: 12, top: 40, bottom: 0, width: 2, bgcolor: 'rgba(0,45,98,0.1)' }} />
                       )}
                       <Box sx={{ width: 24, height: 24, borderRadius: '50%', bgcolor: 'primary.main', mr: 2, zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -11,7 +11,6 @@ import {
     Select,
     MenuItem,
     Box,
-    Typography,
 } from '@mui/material';
 import { CreateWorkflowRequest } from '../../types/workflow.types';
 

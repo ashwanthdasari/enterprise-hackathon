@@ -24,7 +24,6 @@ import {
 } from '@mui/icons-material';
 import { useThemeMode } from '@/theme/ThemeProvider';
 import { settingsService } from '@/services/settingsService';
-import { useAppSelector } from '@/store/hooks';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -43,7 +42,6 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 export const SettingsPage = () => {
     const { mode, toggleTheme } = useThemeMode();
     const [tabIndex, setTabIndex] = useState(0);
-    const { user } = useAppSelector((state) => state.auth);
 
     // Notifications State (Local Storage for demo)
     const [notifications, setNotifications] = useState({
@@ -76,7 +74,7 @@ export const SettingsPage = () => {
         setPasswordSuccess('');
         try {
             await settingsService.changePassword({
-                oldPassword: passwordForm.oldPassword,
+                currentPassword: passwordForm.oldPassword,
                 newPassword: passwordForm.newPassword,
             });
             setPasswordSuccess('Password changed successfully!');

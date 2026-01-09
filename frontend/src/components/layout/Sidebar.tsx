@@ -7,7 +7,6 @@ import {
   ListItemIcon,
   ListItemText,
   Toolbar,
-  Divider,
   Box,
   Typography,
   Chip,
@@ -28,7 +27,7 @@ const DRAWER_WIDTH = 240;
 interface MenuItem {
   title: string;
   path: string;
-  icon: JSX.Element;
+  icon: React.ReactElement;
   requiredPermission?: string;
   allowedRoles?: UserRole[];
 }

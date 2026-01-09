@@ -66,3 +66,11 @@ export interface AlertData {
   timestamp: string;
   read: boolean;
 }
+
+export interface DashboardStats {
+  totalWorkflows: number;
+  activeProjects: number;
+  pendingApprovals: number;
+  completedTasks: number;
+}
+

@@ -37,12 +37,20 @@ export interface WorkflowItem {
     firstName: string;
     lastName: string;
   };
+  createdByName: string;  // Full name for display
   createdAt: string;
   updatedAt: string;
 
   // Future fields (optional for now)
   assignedTo?: string;
   dueDate?: string;
+  history?: Array<{
+    action: string;
+    performedBy: string;
+    performedByName: string;
+    timestamp: string;
+    comment?: string;
+  }>;
 }
 
 export interface CreateWorkflowRequest {

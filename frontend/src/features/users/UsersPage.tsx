@@ -33,7 +33,6 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     FilterList as FilterIcon,
-    MoreVert as MoreIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '@/store/hooks';
 import { UserRole } from '@/types/auth.types';
@@ -45,7 +44,6 @@ export const UsersPage = () => {
     const isAdmin = currentUser?.role === UserRole.ADMIN;
 
     const [users, setUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [search, setSearch] = useState('');
@@ -63,14 +61,11 @@ export const UsersPage = () => {
     });
 
     const fetchUsers = async () => {
-        setLoading(true);
         try {
             const data = await userService.getAll();
             setUsers(data);
         } catch (error) {
             console.error('Failed to fetch users:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -248,7 +243,7 @@ export const UsersPage = () => {
                                             label={u.role.toUpperCase()}
                                             size="small"
                                             color={getRoleColor(u.role) as any}
-                                            variant="soft"
+                                            variant="outlined"
                                             sx={{ fontWeight: 600, borderRadius: 1.5 }}
                                         />
                                     </TableCell>

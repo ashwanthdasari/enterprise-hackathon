@@ -25,7 +25,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { toggleSidebar } from '@/store/slices/uiSlice';
 import { useThemeMode } from '@/theme/ThemeProvider';
-import { UserRole } from '@/types/auth.types';
+
 
 const DRAWER_WIDTH = 240;
 

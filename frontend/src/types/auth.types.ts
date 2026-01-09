@@ -48,3 +48,9 @@ export interface RefreshTokenResponse {
   refreshToken: string;
   expiresIn: number;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
