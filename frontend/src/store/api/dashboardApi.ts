@@ -4,6 +4,7 @@ export interface DashboardStats {
     totalUsers: number;
     totalWorkflows: number;
     pendingReviews: number;
+    activeProjects: number;
     statusDistribution: Record<string, number>;
     departmentDistribution: Record<string, number>;
     monthlyGrowth: Record<string, number>;
