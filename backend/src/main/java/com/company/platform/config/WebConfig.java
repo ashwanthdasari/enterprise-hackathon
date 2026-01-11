@@ -19,7 +19,9 @@ public class WebConfig {
                                 "http://localhost:3000",
                                 "http://localhost:3001",
                                 "http://18.206.74.221:3000",
-                                "http://18.206.74.221")
+                                "http://18.206.74.221",
+                                "http://3.217.47.129:3000", // New server IP
+                                "http://3.217.47.129:8081") // Backend port
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
