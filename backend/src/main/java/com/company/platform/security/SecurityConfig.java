@@ -55,7 +55,9 @@ public class SecurityConfig {
                         "http://18.206.74.221:3000",
                         "http://18.206.74.221",
                         "http://3.217.47.129:3000", // New server IP
-                        "http://3.217.47.129:8081")); // Backend port
+                        "http://3.217.47.129:8081", // Backend port
+                        "http://3.150.62.32:3000", // Current server IP
+                        "http://3.150.62.32:8081")); // Backend port
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
