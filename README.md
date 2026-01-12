@@ -2,7 +2,7 @@
 
 A full-stack enterprise workflow management system built for efficient business process automation with role-based access control, real-time analytics, and comprehensive audit trails.
 
-🌐 **Live Demo**: [http://18.206.74.221:3000](http://18.206.74.221:3000)  
+🌐 **Live Demo**: [http://3.150.62.32:3000](http://3.150.62.32:3000)  
 📂 **Repository**: [https://github.com/ashwanthdasari/enterprise-hackathon](https://github.com/ashwanthdasari/enterprise-hackathon.git)
 
 ---
@@ -139,7 +139,7 @@ mvn spring-boot:run
 The platform provides analytics-ready data views for Power BI dashboards:
 
 **Database Connection:**
-- Host: `18.206.74.221:3306`
+- Host: `3.150.62.32:3306`
 - Database: `project_db`
 - Username: `root`
 - Password: `rootpassword123`
